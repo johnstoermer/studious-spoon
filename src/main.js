@@ -506,10 +506,18 @@ const mapSelect = document.getElementById('map-select');
 const playerSelect = document.getElementById('player-count');
 const winsInput = document.getElementById('target-wins');
 
-Object.entries(MAPS).forEach(([key, map]) => {
+const mapEntries = Object.entries(MAPS);
+mapEntries.forEach(([key, map]) => {
   const opt = document.createElement('option');
   opt.value = key; opt.textContent = map.name;
   mapSelect.appendChild(opt);
+});
+if (MAPS[game.mapKey]) {
+  mapSelect.value = game.mapKey;
+}
+mapSelect.addEventListener('change', e => {
+  const chosen = e.target.value;
+  game.mapKey = MAPS[chosen] ? chosen : game.mapKey;
 });
 
 function renderHud() {
@@ -561,7 +569,7 @@ function showBanner(text) {
 document.getElementById('start-btn').addEventListener('click', () => {
   const playerCount = Number(playerSelect.value);
   const wins = Number(winsInput.value);
-  const mapKey = mapSelect.value;
+  const mapKey = MAPS[mapSelect.value] ? mapSelect.value : mapEntries[0]?.[0] || 'warehouse';
   game.initMatch(playerCount, wins, mapKey);
   game.state = 'countdown';
   menu.classList.add('hidden');
