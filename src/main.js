@@ -1,6 +1,8 @@
 import { MAPS, PLAYER_COLORS } from './maps.js';
 import { WEAPON_TYPES, getWeaponPool } from './weapons.js';
 
+const DEFAULT_MAP_KEY = Object.keys(MAPS)[0] || 'warehouse';
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
@@ -107,7 +109,7 @@ class Game {
     this.pickups = [];
     this.particles = [];
     this.scores = [];
-    this.mapKey = 'warehouse';
+    this.mapKey = MAPS[DEFAULT_MAP_KEY] ? DEFAULT_MAP_KEY : Object.keys(MAPS)[0];
     this.targetWins = 5;
     this.roundTimer = 0;
     this.bannerTimer = 0;
@@ -502,43 +504,14 @@ function update() {
 const menu = document.getElementById('menu');
 const hud = document.getElementById('hud');
 const banner = document.getElementById('round-banner');
-const mapSelect = document.getElementById('map-select');
 const playerSelect = document.getElementById('player-count');
 const winsInput = document.getElementById('target-wins');
 
-const mapEntries = Object.entries(MAPS);
-
-function populateMapSelect() {
-  mapSelect.innerHTML = '';
-
-  if (!mapEntries.length) {
-    const placeholder = document.createElement('option');
-    placeholder.textContent = 'No maps available';
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    mapSelect.appendChild(placeholder);
-    document.getElementById('start-btn').disabled = true;
-    return;
-  }
-
-  mapEntries.forEach(([key, map]) => {
-    const opt = document.createElement('option');
-    opt.value = key; opt.textContent = map.name;
-    mapSelect.appendChild(opt);
-  });
-
-  const defaultMap = MAPS[game.mapKey] ? game.mapKey : mapEntries[0][0];
-  game.mapKey = defaultMap;
-  mapSelect.value = defaultMap;
-  document.getElementById('start-btn').disabled = false;
+function resolveMapKey() {
+  const keys = Object.keys(MAPS);
+  if (game.mapKey && MAPS[game.mapKey]) return game.mapKey;
+  return keys[0] || DEFAULT_MAP_KEY;
 }
-
-populateMapSelect();
-
-mapSelect.addEventListener('change', e => {
-  const chosen = e.target.value;
-  game.mapKey = MAPS[chosen] ? chosen : game.mapKey;
-});
 
 function renderHud() {
   const left = document.getElementById('hud-left');
@@ -589,11 +562,12 @@ function showBanner(text) {
 document.getElementById('start-btn').addEventListener('click', () => {
   const playerCount = Number(playerSelect.value);
   const wins = Number(winsInput.value);
-  const mapKey = MAPS[mapSelect.value] ? mapSelect.value : mapEntries[0]?.[0] || game.mapKey;
+  const mapKey = resolveMapKey();
   if (!MAPS[mapKey]) {
-    populateMapSelect();
+    console.warn('No valid maps available to start a match');
     return;
   }
+  game.mapKey = mapKey;
   game.initMatch(playerCount, wins, mapKey);
   game.state = 'countdown';
   menu.classList.add('hidden');
