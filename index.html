@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon Stick Shooter</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game" width="1280" height="720"></canvas>
+    <div id="menu" class="panel">
+      <h1>Neon Stick Shooter</h1>
+      <p class="muted">Geometry Dash–style chaos for 2–4 players</p>
+      <label>Player Count
+        <select id="player-count">
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </label>
+      <label>Target Round Wins
+        <input id="target-wins" type="number" min="1" max="20" value="5" />
+      </label>
+      <label>Map
+        <select id="map-select"></select>
+      </label>
+      <div class="controls">
+        <p><strong>Controls</strong></p>
+        <ul>
+          <li>Move: WASD (P1), Arrow keys (P2), IJKL (P3), Numpad (P4)</li>
+          <li>Jump: W / Up / I / Numpad8 (double-jump enabled)</li>
+          <li>Crouch/Slide: S / Down / K / Numpad5</li>
+          <li>Throw weapon: Q / Right Ctrl / U / Numpad0</li>
+          <li>Mouse: Aim &amp; shoot (primary fire)</li>
+        </ul>
+      </div>
+      <button id="start-btn">Start Match</button>
+    </div>
+    <div id="hud" class="panel hidden">
+      <div id="hud-left"></div>
+      <div id="hud-center"></div>
+      <div id="hud-right"></div>
+    </div>
+    <div id="round-banner" class="banner hidden"></div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
