@@ -507,14 +507,34 @@ const playerSelect = document.getElementById('player-count');
 const winsInput = document.getElementById('target-wins');
 
 const mapEntries = Object.entries(MAPS);
-mapEntries.forEach(([key, map]) => {
-  const opt = document.createElement('option');
-  opt.value = key; opt.textContent = map.name;
-  mapSelect.appendChild(opt);
-});
-if (MAPS[game.mapKey]) {
-  mapSelect.value = game.mapKey;
+
+function populateMapSelect() {
+  mapSelect.innerHTML = '';
+
+  if (!mapEntries.length) {
+    const placeholder = document.createElement('option');
+    placeholder.textContent = 'No maps available';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    mapSelect.appendChild(placeholder);
+    document.getElementById('start-btn').disabled = true;
+    return;
+  }
+
+  mapEntries.forEach(([key, map]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = map.name;
+    mapSelect.appendChild(opt);
+  });
+
+  const defaultMap = MAPS[game.mapKey] ? game.mapKey : mapEntries[0][0];
+  game.mapKey = defaultMap;
+  mapSelect.value = defaultMap;
+  document.getElementById('start-btn').disabled = false;
 }
+
+populateMapSelect();
+
 mapSelect.addEventListener('change', e => {
   const chosen = e.target.value;
   game.mapKey = MAPS[chosen] ? chosen : game.mapKey;
@@ -569,7 +589,11 @@ function showBanner(text) {
 document.getElementById('start-btn').addEventListener('click', () => {
   const playerCount = Number(playerSelect.value);
   const wins = Number(winsInput.value);
-  const mapKey = MAPS[mapSelect.value] ? mapSelect.value : mapEntries[0]?.[0] || 'warehouse';
+  const mapKey = MAPS[mapSelect.value] ? mapSelect.value : mapEntries[0]?.[0] || game.mapKey;
+  if (!MAPS[mapKey]) {
+    populateMapSelect();
+    return;
+  }
   game.initMatch(playerCount, wins, mapKey);
   game.state = 'countdown';
   menu.classList.add('hidden');
